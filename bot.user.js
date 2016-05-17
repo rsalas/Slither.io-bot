@@ -361,7 +361,6 @@ var bot = (function() {
         followLine: 0,
 
         hideTop: function () {
-
             var nsidivs = document.querySelectorAll('div.nsi');
             for (var i = 0; i < nsidivs.length; i++) {
                 if (nsidivs[i].style.top === '4px' && nsidivs[i].style
@@ -615,7 +614,7 @@ var bot = (function() {
 
                     for(var i=0; i<aggressorCnt; i++) {
                         var aggressor = collisionGrid.snakeAggressors[i];
-                        var mindist = 22500
+                        var mindist = 22500;
                         if( aggressor.snk.sp > 7 ) {
                             mindist = 90000;
                         }
@@ -681,7 +680,7 @@ var bot = (function() {
 
                 for(var i=0; i<aggressorCnt; i++) {
                     var aggressor = collisionGrid.snakeAggressors[i];
-                    var mindist = 22500
+                    var mindist = 22500;
                     if( aggressor.snk.sp > 7 ) {
                         mindist = 90000;
                     }
@@ -704,7 +703,7 @@ var bot = (function() {
                     var aggressor = collisionGrid.snakeAggressors[0];
                     if( aggressor.distance < 22500 ) {
                         var newcoord = {x:aggressor.relativePos.x + window.getX(),
-                                y:aggressor.relativePos.y + window.getY()}
+                                y:aggressor.relativePos.y + window.getY()};
                         //window.goalCoordinates.x = ;
                         //window.goalCoordinates.y = aggressor.relativePos.y + window.getY();
 
@@ -819,6 +818,23 @@ var userInterface = (function() {
             return window[preference];
         },
 
+        // Add classes to hide or show the overlay
+        hideMenu: function() {
+            var elements = document.querySelectorAll('.hideable');
+            elements = elements.length ? elements : [elements];
+            if(window.hidden) {
+                for (var index = 0; index < elements.length; index++) {
+                    window.log('hide tag' . index);
+                    elements[index].style.display = 'none';
+                }
+            } else {
+                for (var index = 0; index < elements.length; index++) {
+                    window.log('show tag' . index);
+                    elements[index].style.display = 'block';
+                }
+            }
+        },
+
         // Execute functions when you click on "Play" button
         playButtonClickListener: function() {
             userInterface.saveNick(); // Saves username
@@ -894,6 +910,13 @@ var userInterface = (function() {
         onkeydown: function(e) {
             // Original slither.io onkeydown function + whatever is under it
             original_keydown(e);
+            // We should always be able to toggle overlay with 'H'
+            if (e.keyCode == 72) {
+                window.hideAll = !window.hideAll;
+                window.log('Hiding overlay set to: ' + window.hideAll);
+                userInterface.savePreference('hideAll', window.hideAll);
+                userInterface.hideMenu();
+            }
             if (window.playing) {
                 // Letter `T` to toggle bot
                 if (e.keyCode === 84) {
@@ -1103,6 +1126,8 @@ window.sosBackup = sos;
     userInterface.loadPreference('autoRespawn', false);
     userInterface.loadPreference('mobileRender', false);
     userInterface.loadPreference('rotateskin', false);
+    // Check if things should be hidden
+    userInterface.loadPreference('hideAll', false);
     window.nick.value = userInterface.loadPreference('savedNick',
         'Slither.io-bot');
 
@@ -1110,33 +1135,45 @@ window.sosBackup = sos;
     window.generalstyle =
         'color: #FFF; font-family: Arial, \'Helvetica Neue\',' +
         ' Helvetica, sans-serif; font-size: 14px; position: fixed; z-index: 7;';
+    /*if(!window.hideAll) {
++        window.generalstyle =
+        'color: #FFF; font-family: Arial, \'Helvetica Neue\',' +
+        ' Helvetica, sans-serif; font-size: 14px; position: fixed; z-index: 7;';
++    } else {
++        window.generalstyle = 'display: none;' +
+        ' color: #FFF; font-family: Arial, \'Helvetica Neue\',' +
+        ' Helvetica, sans-serif; font-size: 14px; position: fixed; z-index: 7;';
++    }*/
+
     window.spanstyle = '<span style = "opacity: 0.35";>';
 
     // Top left
-    userInterface.appendDiv('version_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('version_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 50px;');
-    userInterface.appendDiv('botstatus_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('botstatus_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 65px;');
-    userInterface.appendDiv('visualdebugging_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('visualdebugging_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 80px;');
-    userInterface.appendDiv('logdebugging_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('logdebugging_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 95px;');
-    userInterface.appendDiv('autorespawn_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('autorespawn_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 110px;');
-    userInterface.appendDiv('rendermode_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('rendermode_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 125px;');
-    userInterface.appendDiv('rotateskin_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('rotateskin_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 140px;');
-    userInterface.appendDiv('resetzoom_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('resetzoom_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 155px;');
-    userInterface.appendDiv('scroll_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('scroll_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 170px;');
-    userInterface.appendDiv('quickResp_overlay', 'nsi', window.generalstyle +
-        'left: 30; top: 285px;');
-    userInterface.appendDiv('changeskin_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('changeskin_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 200px;');
-    userInterface.appendDiv('quittomenu_overlay', 'nsi', window.generalstyle +
+    userInterface.appendDiv('quittomenu_overlay', 'nsi hideable', window.generalstyle +
         'left: 30; top: 215px;');
+    userInterface.appendDiv('quickResp_overlay', 'nsi hideable', window.generalstyle +
+        'left: 30; top: 230px;');
+    userInterface.appendDiv('hidemenu_overlay', 'nsi', window.generalstyle +
+        'left: 30; top: 245px;');
 
     // Bottom right
     userInterface.appendDiv('position_overlay', 'nsi', window.generalstyle +
@@ -1155,12 +1192,14 @@ window.sosBackup = sos;
         '(Z) Reset zoom </span>';
     window.scroll_overlay.innerHTML = window.spanstyle +
         '(Mouse Wheel) Zoom in/out </span>';
-    window.quittomenu_overlay.innerHTML = window.spanstyle +
-        '(Q) Quit to menu </span>';
     window.changeskin_overlay.innerHTML = window.spanstyle +
         '(X) Change skin </span>';
+    window.quittomenu_overlay.innerHTML = window.spanstyle +
+        '(Q) Quit to menu </span>';
     window.quickResp_overlay.innerHTML = window.spanstyle +
         '(ESC) Quick Respawn </span>';
+    window.hidemenu_overlay.innerHTML = window.spanstyle +
+        '(H) Hide menu </span>';
     window.version_overlay.innerHTML = window.spanstyle +
         // eslint-disable-next-line no-undef
         'Version: ' + GM_info.script.version + '</span>';
@@ -1760,8 +1799,8 @@ var collisionGrid = (function() {
 
             var col = parseInt(Math.floor(x / collisionGrid.cellSize));
             var row = parseInt(Math.floor(y / collisionGrid.cellSize));
-            var col = Math.min(Math.max(col, 0), collisionGrid.gridWidth);
-            var row = Math.min(Math.max(row, 0), collisionGrid.gridHeight);
+            col = Math.min(Math.max(col, 0), collisionGrid.gridWidth);
+            row = Math.min(Math.max(row, 0), collisionGrid.gridHeight);
             collisionGrid.grid[col] = collisionGrid.grid[col] || [];
             collisionGrid.grid[col][row] = collisionGrid.grid[col][row] || 0;
             return {col:col, row:row, cell:collisionGrid.grid[col][row]};
